@@ -6,7 +6,8 @@ interface
 
 uses
   Classes, SysUtils, FileUtil, Forms, Controls, Graphics, Dialogs, StdCtrls, Pipes,
-  fpjson, jsonparser, unit1, typinfo, ExtCtrls, Variants, ComCtrls, EditBtn, Spin, Calendar;
+  fpjson, jsonparser, unit1, typinfo, ExtCtrls, Variants, ComCtrls, EditBtn, Spin, Calendar,
+  cef3lcl, cef3intf, cef3types, cef3lib, gettext;
 
 type
 
@@ -164,6 +165,12 @@ begin
   RegisterClass(TDateEdit);
   RegisterClass(TTimeEdit);
   RegisterClass(TCalendar);
+  RegisterClass(TChromium);
+  RegisterClass(ICefBrowser);
+  RegisterClass(ICefDownloadItem);
+  RegisterClass(ICefBeforeDownloadCallback);
+  RegisterClass(TCefPdfPrintSettings);
+  RegisterClass(TCefStringUtf16);
 
   // Initializes the input pipe (Stdin)
   StdinStream := TInputPipeStream.Create(StdInputHandle);
@@ -396,6 +403,10 @@ begin
     else if messageMethodName = 'image.loadFromFile' then
     begin
       (objArray[objId] as TImage).Picture.LoadFromFile(jData.FindPath('params[2][0]').AsString);
+    end
+    else if messageMethodName = 'browser.load' then
+    begin
+      (objArray[objId] as TChromium).Load(UTF8Decode(jData.FindPath('params[2][0]').AsString));
     end
     else if messageMethodName = 'lines.clear' then
     begin
